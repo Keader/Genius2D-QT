@@ -52,6 +52,41 @@ void Genius::reiniciaJogo()
   qDebug() << "Jogo esta sendo reiniciado...";
 }
 
+void Genius::carregarDesafio()
+{
+  setStylesDosBotoes();
+  respostas.clear();
+  desafio.clear();
+  for (int i = 0; i < _level; ++i)
+  {
+    int random = QRandomGenerator::global()->bounded(0, 4);
+    acaoDoButao(Color(Color(random)));
+    desafio.push_back(Color(random));
+    // 500 ms de delay
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+  // permite o player jogar
+  _jogoIniciado = true;
+}
+
+void Genius::startGame()
+{
+    carregarDesafio();
+}
+
+void Genius::checaVitoria()
+{
+  if (respostas[_respostasDoJogador] == desafio[_respostasDoJogador])
+  {
+    if (respostas.size() == desafio.size())
+        emit _passouDeNivel(); // Envia evento que passou de nivel
+     else
+        ++_respostasDoJogador;
+  }
+  else
+      emit _perdeuNoNivel(); // Envia evento que perdeu o nivel
+}
+
 void Genius::handleBotaoVerde()
 {
   acaoDoButao(Color::verde);
@@ -198,39 +233,4 @@ void Genius::acaoDoButao(Color color)
         default:
             break;
     }
-}
-
-void Genius::carregarDesafio()
-{
-  setStylesDosBotoes();
-  respostas.clear();
-  desafio.clear();
-  for (int i = 0; i < _level; ++i)
-  {
-    int random = QRandomGenerator::global()->bounded(0, 4);
-    acaoDoButao(Color(Color(random)));
-    desafio.push_back(Color(random));
-    // 500 ms de delay
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-  }
-  // permite o player jogar
-  _jogoIniciado = true;
-}
-
-void Genius::startGame()
-{
-    carregarDesafio();
-}
-
-void Genius::checaVitoria()
-{
-  if (respostas[_respostasDoJogador] == desafio[_respostasDoJogador])
-  {
-    if (respostas.size() == desafio.size())
-        emit _passouDeNivel(); // Envia evento que passou de nivel
-     else
-        ++_respostasDoJogador;
-  }
-  else
-      emit _perdeuNoNivel(); // Envia evento que perdeu o nivel
 }
